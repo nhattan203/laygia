@@ -46,6 +46,8 @@ for (let msg of messages) {
         document.getElementById('giaTieu').innerText = 'Lỗi tải dữ liệu!';
     }
 }
-
 // Gọi hàm fetchGia() khi load trang
 fetchGia();
+
+// Gọi lại fetchGia() mỗi 60 giây (60000 ms)
+setInterval(fetchGia, 60000);
