@@ -12,17 +12,25 @@ async function fetchGia() {
         let giaCaPhe = "không tìm thấy dữ liệu";
         let giaTieu = "không tìm thấy dữ liệu";
 
-        for (let msg of messages) {
-            if (msg.message && msg.message.chat && msg.message.chat.id === groupId) {
-                const text = msg.message.text || "";
-                if (text.toLowerCase().includes('giá cà phê') && giaCaPhe === "không tìm thấy dữ liệu") {
-                    giaCaPhe = text;
-                }
-                if (text.toLowerCase().includes('giá tiêu') && giaTieu === "không tìm thấy dữ liệu") {
-                    giaTieu = text;
-                }
-            }
-        }
+for (let msg of messages) {
+    if (!msg.message || !msg.message.chat || msg.message.chat.id !== groupId) continue;
+
+    const text = (msg.message.text || "").toLowerCase();
+
+    if (text.includes('giá cà phê') && giaCaPhe === "không tìm thấy dữ liệu") {
+        giaCaPhe = msg.message.text;
+    }
+
+    if (text.includes('giá tiêu') && giaTieu === "không tìm thấy dữ liệu") {
+        giaTieu = msg.message.text;
+    }
+
+    // Nếu đã tìm đủ 2 dữ liệu rồi thì dừng luôn cho nhanh
+    if (giaCaPhe !== "không tìm thấy dữ liệu" && giaTieu !== "không tìm thấy dữ liệu") {
+        break;
+    }
+}
+
 
         document.getElementById('giaCaPhe').innerText = giaCaPhe;
         document.getElementById('giaTieu').innerText = giaTieu;
