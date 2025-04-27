@@ -42,4 +42,5 @@ async function fetchGia() {
 
 // Load lúc đầu + tự động làm mới mỗi phút
 fetchGia();
-setInterval(fetchGia, 60000);
+setInterval(fetchGia, 1000); // 1000ms = 1 giây
+
