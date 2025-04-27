@@ -1,7 +1,6 @@
-const proxyUrl = 'https://script.google.com/macros/s/AKfycbygYrWQZoHJlfEA8hpgiK-ODwzu3FmoEKC51uW_BrzGFnMfkEzmNcx_u5FYHNOgOldC/exec'; // <-- thay đúng link WebApp
-const botToken = '7945913782:AAEH8_nwqQeMMxHYRqg1u6yuEwDzGXlq9pM'; // <-- thay bằng token bot
-const groupId = -1002434982879; // <-- thay ID nhóm Telegram
-
+const proxyUrl = 'https://script.google.com/macros/s/AKfycbygYrWQZoHJlfEA8hpgiK-ODwzu3FmoEKC51uW_BrzGFnMfkEzmNcx_u5FYHNOgOldC/exec';
+const botToken = '7945913782:AAEH8_nwqQeMMxHYRqg1u6yuEwDzGXlq9pM';
+const groupId = -1002434982879;
 
 async function fetchGia() {
     try {
@@ -9,31 +8,25 @@ async function fetchGia() {
         const data = await res.json();
         const messages = data.result.reverse();
 
-        let giaCaPhe = "không tìm thấy dữ liệu";
-        let giaTieu = "không tìm thấy dữ liệu";
+        let giaCaPhe = "Không tìm thấy dữ liệu.";
+        let giaTieu = "Không tìm thấy dữ liệu.";
 
-for (let msg of messages) {
-    if (!msg.message || !msg.message.chat || msg.message.chat.id !== groupId) continue;
+        for (let msg of messages) {
+            if (msg.message && msg.message.chat && msg.message.chat.id === groupId) {
+                const text = msg.message.text || "";
 
-    const text = (msg.message.text || "").toLowerCase();
+                if (text.toLowerCase().includes('giá cà phê') && giaCaPhe === "Không tìm thấy dữ liệu.") {
+                    giaCaPhe = text.replace(/\n/g, '<br>'); // Giữ định dạng xuống dòng
+                }
 
-    if (text.includes('giá cà phê') && giaCaPhe === "không tìm thấy dữ liệu") {
-        giaCaPhe = msg.message.text;
-    }
+                if (text.toLowerCase().includes('giá tiêu') && giaTieu === "Không tìm thấy dữ liệu.") {
+                    giaTieu = text.replace(/\n/g, '<br>');
+                }
+            }
+        }
 
-    if (text.includes('giá tiêu') && giaTieu === "không tìm thấy dữ liệu") {
-        giaTieu = msg.message.text;
-    }
-
-    // Nếu đã tìm đủ 2 dữ liệu rồi thì dừng luôn cho nhanh
-    if (giaCaPhe !== "không tìm thấy dữ liệu" && giaTieu !== "không tìm thấy dữ liệu") {
-        break;
-    }
-}
-
-
-        document.getElementById('giaCaPhe').innerText = giaCaPhe;
-        document.getElementById('giaTieu').innerText = giaTieu;
+        document.getElementById('giaCaPhe').innerHTML = giaCaPhe;
+        document.getElementById('giaTieu').innerHTML = giaTieu;
 
         const now = new Date();
         const timeStr = now.toLocaleTimeString('vi-VN');
@@ -46,8 +39,7 @@ for (let msg of messages) {
         document.getElementById('giaTieu').innerText = 'Lỗi tải dữ liệu!';
     }
 }
-// Gọi hàm fetchGia() khi load trang
-fetchGia();
 
-// Gọi lại fetchGia() mỗi 60 giây (60000 ms)
+// Load lúc đầu + tự động làm mới mỗi phút
+fetchGia();
 setInterval(fetchGia, 60000);
