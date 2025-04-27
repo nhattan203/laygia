@@ -2,126 +2,160 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>☕🌱 Giá Cà Phê & Giá Tiêu</title>
-  <script src="script.js"></script>
-
-  <!-- Font đẹp -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+  <title>Trương Nhật Tân - Giá Cà Phê & Giá Tiêu</title>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #e0f7fa, #f1f8e9);
+      font-family: "Arial", sans-serif;
+      background: linear-gradient(to bottom right, #e0f7fa, #e8f5e9);
       margin: 0;
-      padding: 30px;
-      min-height: 100vh;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
+
     h1 {
-      font-size: 28px;
       color: #2e7d32;
       margin-bottom: 30px;
-      text-align: center;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
+
     .container {
       display: flex;
+      flex-wrap: wrap;
       gap: 20px;
-      max-width: 1200px;
+      justify-content: center;
       width: 100%;
+      max-width: 1200px;
     }
+
     .card {
-      flex: 1;
       background: white;
       border-radius: 16px;
-      padding: 25px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      flex: 1 1 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 280px;
+      max-width: 500px;
     }
-    .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
+
     h2 {
       color: #388e3c;
       font-size: 22px;
       margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    #giaCaPhe, #giaTieu {
+
+    #countdown {
+      margin: 15px 0;
       font-size: 16px;
-      color: #424242;
-      line-height: 1.6;
+      color: #555;
+      text-align: center;
     }
+
+    .content {
+      text-align: center;
+      margin-bottom: auto;
+      font-size: 16px;
+      color: #444;
+    }
+
     .time {
+      font-size: 14px;
+      color: #888;
       margin-top: 20px;
-      font-size: 12px;
-      color: #757575;
-      text-align: right;
+      text-align: center;
     }
   </style>
 </head>
 <body>
 
-<h1>☕🌱 Trương Nhật Tân - Giá Cà Phê & Giá Tiêu</h1>
+<h1>🌱 Trương Nhật Tân - Giá Cà Phê & Giá Tiêu 🌱</h1>
+
+<div id="countdown">⏳ Tự động làm mới sau: 60s</div>
 
 <div class="container">
   <div class="card">
     <h2>☕ Giá Cà Phê</h2>
-    <div id="giaCaPhe">Đang tải...</div>
+    <div id="giaCaPhe" class="content">Đang tải...</div>
     <div id="timeCaPhe" class="time">Cập nhật lúc: ...</div>
   </div>
 
   <div class="card">
-    <h2>🌱 Giá Tiêu</h2>
-    <div id="giaTieu">Đang tải...</div>
+    <h2>🌿 Giá Tiêu</h2>
+    <div id="giaTieu" class="content">Đang tải...</div>
     <div id="timeTieu" class="time">Cập nhật lúc: ...</div>
   </div>
 </div>
-<div id="countdown" style="margin: 20px 0; font-size: 16px; color: #555; text-align: center;">⏳ Tự động làm mới sau: 60s</div>
 
 <script>
-const proxyUrl = 'https://script.google.com/macros/s/AKfycbygYrWQZoHJlfEA8hpgiK-ODwzu3FmoEKC51uW_BrzGFnMfkEzmNcx_u5FYHNOgOldC/exec'; // <-- THAY bằng link WebApp của bạn
-const botToken = '7945913782:AAEH8_nwqQeMMxHYRqg1u6yuEwDzGXlq9pM'; // <-- THAY bằng token bot phụ
-const groupId = -1002434982879; // <-- THAY bằng group id nhóm
+const proxyUrl = 'https://script.google.com/macros/s/AKfycbygYrWQZoHJlfEA8hpgiK-ODwzu3FmoEKC51uW_BrzGFnMfkEzmNcx_u5FYHNOgOldC/exec';
+const botToken = '7945913782:AAEH8_nwqQeMMxHYRqg1u6yuEwDzGXlq9pM';
+const groupId = -1002434982879;
+
+let countdown = 60; // 60s
 
 async function fetchGia() {
-  try {
-    const res = await fetch(proxyUrl + '?url=' + encodeURIComponent(`https://api.telegram.org/bot${botToken}/getUpdates`));
-    const data = await res.json();
-    const messages = data.result.reverse(); // Đảo ngược: tin mới nhất trước
+    try {
+        const res = await fetch(proxyUrl + '?url=' + encodeURIComponent('https://api.telegram.org/bot' + botToken + '/getUpdates'));
+        const data = await res.json();
+        const messages = data.result.reverse();
 
-    let giaCaPhe = "Không tìm thấy dữ liệu";
-    let giaTieu = "Không tìm thấy dữ liệu";
+        let giaCaPhe = "Không tìm thấy dữ liệu.";
+        let giaTieu = "Không tìm thấy dữ liệu.";
 
-    for (let msg of messages) {
-      if (msg.message && msg.message.chat && msg.message.chat.id === groupId) {
-        const text = msg.message.text || '';
-        if (text.includes('Giá Cà Phê') && giaCaPhe === "Không tìm thấy dữ liệu") {
-          giaCaPhe = text;
-        } 
-        if (text.includes('Giá Tiêu') && giaTieu === "Không tìm thấy dữ liệu") {
-          giaTieu = text;
+        for (let msg of messages) {
+            if (msg.message && msg.message.chat && msg.message.chat.id === groupId) {
+                const text = msg.message.text || "";
+
+                if (text.toLowerCase().includes('giá cà phê') && giaCaPhe === "Không tìm thấy dữ liệu.") {
+                    giaCaPhe = text.replace(/\n/g, '<br>');
+                }
+
+                if (text.toLowerCase().includes('giá tiêu') && giaTieu === "Không tìm thấy dữ liệu.") {
+                    giaTieu = text.replace(/\n/g, '<br>');
+                }
+            }
         }
-      }
+
+        document.getElementById('giaCaPhe').innerHTML = giaCaPhe;
+        document.getElementById('giaTieu').innerHTML = giaTieu;
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('vi-VN');
+        document.getElementById('timeCaPhe').innerText = "Cập nhật lúc: " + timeStr;
+        document.getElementById('timeTieu').innerText = "Cập nhật lúc: " + timeStr;
+
+        countdown = 60; // Reset đếm ngược sau mỗi lần tải
+
+    } catch (e) {
+        console.error(e);
+        document.getElementById('giaCaPhe').innerText = 'Lỗi tải dữ liệu!';
+        document.getElementById('giaTieu').innerText = 'Lỗi tải dữ liệu!';
     }
+}
 
-    document.getElementById('giaCaPhe').innerText = giaCaPhe;
-    document.getElementById('giaTieu').innerText = giaTieu;
-
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString('vi-VN');
-    document.getElementById('timeCaPhe').innerText = "Cập nhật lúc: " + timeStr;
-    document.getElementById('timeTieu').innerText = "Cập nhật lúc: " + timeStr;
-  } catch (e) {
-    console.error(e);
-    document.getElementById('giaCaPhe').innerText = 'Lỗi tải dữ liệu!';
-    document.getElementById('giaTieu').innerText = 'Lỗi tải dữ liệu!';
-  }
+function startCountdown() {
+    setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+            fetchGia();
+            countdown = 60;
+        }
+        document.getElementById('countdown').innerText = `⏳ Tự động làm mới sau: ${countdown}s`;
+    }, 1000);
 }
 
 fetchGia();
-setInterval(fetchGia, 60000); // Cập nhật mỗi phút
+startCountdown();
 </script>
 
 </body>
