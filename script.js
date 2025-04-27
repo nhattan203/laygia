@@ -2,6 +2,8 @@ const proxyUrl = 'https://script.google.com/macros/s/AKfycbygYrWQZoHJlfEA8hpgiK-
 const botToken = '7945913782:AAEH8_nwqQeMMxHYRqg1u6yuEwDzGXlq9pM';
 const groupId = -1002434982879;
 
+let countdown = 60; // 60s
+
 async function fetchGia() {
     try {
         const res = await fetch(proxyUrl + '?url=' + encodeURIComponent('https://api.telegram.org/bot' + botToken + '/getUpdates'));
@@ -16,7 +18,7 @@ async function fetchGia() {
                 const text = msg.message.text || "";
 
                 if (text.toLowerCase().includes('giá cà phê') && giaCaPhe === "Không tìm thấy dữ liệu.") {
-                    giaCaPhe = text.replace(/\n/g, '<br>'); // Giữ định dạng xuống dòng
+                    giaCaPhe = text.replace(/\n/g, '<br>');
                 }
 
                 if (text.toLowerCase().includes('giá tiêu') && giaTieu === "Không tìm thấy dữ liệu.") {
@@ -33,6 +35,8 @@ async function fetchGia() {
         document.getElementById('timeCaPhe').innerText = "Cập nhật lúc: " + timeStr;
         document.getElementById('timeTieu').innerText = "Cập nhật lúc: " + timeStr;
 
+        countdown = 60; // Reset đếm ngược sau mỗi lần tải thành công
+
     } catch (e) {
         console.error(e);
         document.getElementById('giaCaPhe').innerText = 'Lỗi tải dữ liệu!';
@@ -40,7 +44,19 @@ async function fetchGia() {
     }
 }
 
-// Load lúc đầu + tự động làm mới mỗi phút
-fetchGia();
-setInterval(fetchGia, 1000); // 1000ms = 1 giây
+// Hàm cập nhật đếm ngược mỗi giây
+function startCountdown() {
+    setInterval(() => {
+        countdown--;
+        if (countdown <= 0) {
+            fetchGia();
+            countdown = 60;
+        }
+        // Cập nhật thời gian còn lại trên giao diện
+        document.getElementById('countdown').innerText = `⏳ Tự động làm mới sau: ${countdown}s`;
+    }, 1000);
+}
 
+// Khi trang load
+fetchGia();
+startCountdown();
